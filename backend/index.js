@@ -2,7 +2,10 @@ import express from 'express'
 import dotenv from 'dotenv'
 import mongoose from 'mongoose'
 import authRoute from './routes/auth.js'
-import authHotel from './routes/hotels.js'
+import hotelRoute from './routes/hotels.js'
+import userRoute from "./routes/users.js";
+import roomRoute from "./routes/rooms.js";
+import cookieParser from 'cookie-parser'
 
 dotenv.config()
 
@@ -19,12 +22,27 @@ try {
 
 
 // Middleware
+app.use(cookieParser())
 app.use(express.json())
 
 
 
-app.use('/auth', authRoute)
-app.use('/api/hotels', authHotel)
+app.use('/api/auth', authRoute)
+app.use("/api/hotels", hotelRoute);
+app.use('/api/users', userRoute)
+app.use("/api/rooms", roomRoute);
+
+
+app.use((err, req, res, next) => {
+  const errorStatus = err.status || 500
+  const errorMessage = err.message || "something went wrong"
+  return res.status(errorStatus).json({
+    success: false,
+    status : errorStatus,
+    message: errorMessage,
+    stack: err.statck,
+  })
+})
 
 
 
